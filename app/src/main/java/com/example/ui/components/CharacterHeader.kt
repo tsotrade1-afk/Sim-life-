@@ -31,6 +31,7 @@ fun CharacterHeader(
     onNewLifeClick: () -> Unit,
     onGraveyardClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onPhoneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currencyFormatter = NumberFormat.getNumberInstance(Locale.US).apply {
@@ -105,11 +106,20 @@ fun CharacterHeader(
                     )
                 }
 
-                // Action buttons: Graveyard, Settings, New Life
+                // Action buttons: Phone, Graveyard, Settings, New Life
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
+                    IconButton(
+                        onClick = onPhoneClick,
+                        modifier = Modifier
+                            .size(34.dp)
+                            .testTag("header_phone_button")
+                    ) {
+                        Text("📱", fontSize = 16.sp)
+                    }
+
                     IconButton(
                         onClick = onGraveyardClick,
                         modifier = Modifier

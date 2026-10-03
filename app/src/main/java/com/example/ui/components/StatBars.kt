@@ -28,6 +28,7 @@ fun StatBars(
     health: Int,
     smarts: Int,
     looks: Int,
+    hunger: Int = 90,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -41,8 +42,8 @@ fun StatBars(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             StatItem(
                 label = "Happy",
@@ -75,6 +76,14 @@ fun StatBars(
                 barColor = StatLooksColor,
                 modifier = Modifier.weight(1f),
                 tag = "stat_looks"
+            )
+            StatItem(
+                label = "Food",
+                emoji = if (hunger <= 25) "⚠️" else "🥗",
+                value = hunger,
+                barColor = if (hunger <= 25) LifeRose else Color(0xFF10B981),
+                modifier = Modifier.weight(1f),
+                tag = "stat_hunger"
             )
         }
     }

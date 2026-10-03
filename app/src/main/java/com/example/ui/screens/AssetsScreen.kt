@@ -38,7 +38,7 @@ fun AssetsScreen(
     val symbol = character.currencySymbol
 
     val totalAssetValue = character.assets.sumOf { it.value }
-    val netWorth = character.bankBalance + totalAssetValue
+    val netWorth = character.bankBalance + totalAssetValue - character.debt
     val annualMaint = character.assets.sumOf { it.annualMaintenance }
 
     LazyColumn(
@@ -99,7 +99,7 @@ fun AssetsScreen(
                             }
                         }
                         Text(
-                            text = if (character.hasPhone) "News • SimBank Wire • Richest 100" else if (character.currentYear >= 2001) "Buy in Tech Store (${character.currencySymbol}499)" else "Invented in Year 2001",
+                            text = if (character.hasPhone) "News • SimBank Wire • Richest 100 • Uber" else "Available in Tech Market (${character.currencySymbol}499)",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -174,6 +174,18 @@ fun AssetsScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold
                             )
+                        }
+
+                        if (character.debt > 0) {
+                            Column {
+                                Text(text = "Debt", style = MaterialTheme.typography.labelSmall)
+                                Text(
+                                    text = "-$symbol${currencyFormatter.format(character.debt)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = LifeRose
+                                )
+                            }
                         }
 
                         Column {

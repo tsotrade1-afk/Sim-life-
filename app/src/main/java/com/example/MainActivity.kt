@@ -151,12 +151,13 @@ fun LifeSimApp(viewModel: LifeViewModel) {
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
-            // Animated 4 Core Stat Bars (Happiness, Health, Smarts, Looks)
+            // Animated 5 Core Stat Bars (Happiness, Health, Smarts, Looks, Food)
             StatBars(
                 happiness = character.happiness,
                 health = character.health,
                 smarts = character.smarts,
                 looks = character.looks,
+                hunger = character.hunger,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
             )
 
@@ -177,7 +178,12 @@ fun LifeSimApp(viewModel: LifeViewModel) {
                             onDoctorClick = { viewModel.triggerDoctorTwoStep() },
                             onLotteryClick = { viewModel.playLottery() },
                             onVacationClick = { luxury -> viewModel.takeVacation(luxury) },
-                            onBuyAsset = { asset -> viewModel.buyAsset(asset) }
+                            onBuyAsset = { asset -> viewModel.buyAsset(asset) },
+                            onBuyFood = { food -> viewModel.buyFood(food) },
+                            onStartLemonade = { viewModel.startLemonadeStand() },
+                            onBuyLemonadeSupplies = { viewModel.buyLemonadeSupplies() },
+                            onSetLemonadePrice = { price -> viewModel.setLemonadePrice(price) },
+                            onUpgradeLemonadeStand = { viewModel.upgradeLemonadeStand() }
                         )
                     }
                     LifeSimTab.CAREER -> {
@@ -187,6 +193,8 @@ fun LifeSimApp(viewModel: LifeViewModel) {
                             onAskForRaise = { viewModel.askForRaise() },
                             onResign = { viewModel.resignJob() },
                             onApplyJob = { job -> viewModel.openJobInterview(job) },
+                            onApplySideJob = { job -> viewModel.applySideJob(job) },
+                            onResignSideJob = { id -> viewModel.resignSideJob(id) },
                             onSelectGig = { gig -> viewModel.openClientGig(gig) }
                         )
                     }
@@ -218,6 +226,15 @@ fun LifeSimApp(viewModel: LifeViewModel) {
             },
             onReceiveMoney = { amount, source ->
                 viewModel.receiveBankMoney(amount, source)
+            },
+            onPayDebt = { amount ->
+                viewModel.payBankDebt(amount)
+            },
+            onTakeLoan = { amount ->
+                viewModel.takeBankLoan(amount)
+            },
+            onCompleteUberRide = { trip ->
+                viewModel.completeUberRide(trip)
             },
             onBuyPhoneShortcut = {
                 viewModel.closePhone()

@@ -26,54 +26,55 @@ object NewsAndRichDatabase {
     val ROADMAP_MILESTONES: List<RoadmapMilestone> = listOf(
         RoadmapMilestone(
             phase = "PHASE 1 (COMPLETED)",
-            title = "v2.1 Bug Fixes & Tech Category Expansion",
+            title = "v2.3 Phone Market, Bank Logs & Multi-Jobs",
             status = "Completed",
-            icon = "🛠️",
-            description = "Fixed Age 0 bug, added dedicated Tech category in Asset store, SimBank transfers, and reverse life feed with auto-scroll.",
+            icon = "📱",
+            description = "SimPhones in market category, SimBank statements & wires, side hustles across 9 categories, Lemonade Stand business, and fancy supercars.",
             highlights = listOf(
-                "Age 0 bug completely fixed: age advances every year (+1 Year)",
-                "Dedicated Tech & Electronics store category (SimPhones, Laptops, Watches)",
-                "Smart Life Feed with reverse chronology and auto-scroll to latest age",
-                "SimPhone cleanly accessed from Assets tab without header clutter"
+                "Phone permanently in Market under Tech & Devices category (no year delay)",
+                "SimBank: Full Transaction Statement Log and debt payoff center",
+                "Career System: 9 rich job categories and simultaneous side hustles",
+                "Lemonade Stand: Upgrades, lemon supplies, cup pricing, and yearly revenue",
+                "Fancy Cars: Ferrari, Bugatti, Rolls-Royce, Pagani Huayra, and McLaren",
+                "Food Market: Buy groceries each year to keep hunger filled & stay healthy"
             )
         ),
         RoadmapMilestone(
-            phase = "PHASE 2 (COMPLETED)",
-            title = "v2.0 SimPhone, Banking & Wealth Era",
-            status = "Completed",
-            icon = "📱",
-            description = "SimPhone ($499) & SimPhone Pro ($999) released in 2001, SimBank with wire transfers, year-by-year news unlocking, and 100 Richest People ladder.",
+            phase = "PHASE 2 (NEXT UP)",
+            title = "Structured Assets & Cashflow Intelligence",
+            status = "In Development",
+            icon = "📊",
+            description = "Manage and see exactly where all finances are coming and going with automated financial statements.",
             highlights = listOf(
-                "Buy SimPhone ($499) or SimPhone Pro ($999) with player savings",
-                "SimBank app: Send money to family/friends with 2-second wire transfer animation",
-                "50 World News stories unlocking progressively year-by-year (1991 - 2026)",
-                "Real-world 100 Richest People ladder on SimPhone Pro"
+                "Cashflow In/Out Engine: Detailed breakdown of salary, business revenue, side gigs vs taxes, debt interest, groceries, and asset maintenance",
+                "Structured Asset Ledger: Real-time appreciation, depreciation, rental yields, and equity valuation",
+                "Debt & Loan Amortization: Custom debt repayment plans, interest rate hedging, and early payoff bonuses",
+                "Financial Net Worth Growth Graph: Annual ledger chart tracking your journey from $0 to billionaire"
             )
         ),
         RoadmapMilestone(
             phase = "PHASE 3 (NEXT UP)",
-            title = "Deep Customization Studio",
+            title = "Culinary Mastery & Advanced Food System",
             status = "Next Up",
-            icon = "🎨",
-            description = "Extensive character creation studio requested by the community.",
+            icon = "🍳",
+            description = "Expanded food mechanics, diet plans, cooking recipes, and restaurant founding.",
             highlights = listOf(
-                "Bespoke hairstyles, hair dyes, facial hair, and eye colors",
-                "Fashion wardrobe: Casual, Business Formal, Streetwear, Haute Couture",
-                "Personality trait matrix (Genius, Charismatic, Workaholic, Daredevil)",
-                "Custom family heritage & starting parent wealth background"
+                "Supermarket grocery aisles with ingredient crafting and home cooking buffs",
+                "Dietary styles: Keto, Mediterranean, Vegan, and Bodybuilder macros with health multipliers",
+                "Culinary school degree and opening a fine-dining restaurant chain"
             )
         ),
         RoadmapMilestone(
             phase = "PHASE 4 (PLANNED)",
-            title = "Stock Market, Crypto & Business Empire",
+            title = "Business Tycoon & Corporate Empire",
             status = "Planned",
-            icon = "📈",
-            description = "Live simulated financial markets and company founding.",
+            icon = "🏢",
+            description = "Scale up from a Lemonade Stand into multi-million dollar corporations.",
             highlights = listOf(
-                "Buy/Sell shares of tech giants, index funds, and commodity ETFs",
-                "Crypto exchange with meme coins and blockchain volatility",
-                "Found your own startup: Hire employees, run ad campaigns, go public (IPO)",
-                "Commercial real estate developments: Hotels, malls, and skyscrapers"
+                "Found tech software companies, beverage brands, or fashion chains",
+                "Hire and manage executive leadership (CTO, CFO, CMO)",
+                "Raise venture capital rounds (Seed, Series A-C) and launch Wall Street IPO",
+                "Acquire competing businesses and build an international conglomerate"
             )
         ),
         RoadmapMilestone(

@@ -41,7 +41,56 @@ object LifeEventGenerator {
 
     val GAME_UPDATE_LOGS = listOf(
         UpdateLogEntry(
-            version = "v2.1 - Bug Fixes & Tech Store Expansion [LATEST UPDATE]",
+            version = "v2.4 - The Desktop PC, 10 Business Empires, SimPhone Max & Real Life [LATEST UPDATE]",
+            releaseDate = "October 2026",
+            highlight = "Year 2003 Desktop PC with R-Team (5 playable games), 10 in-depth businesses with managers & custom phone manufacturing, SimPhone Max, parent meals under 18, and home router requirement!",
+            changes = listOf(
+                "🖥️ Year 2003 Desktop PC Era: Personal computers launch in 2003! Access the PC Workstation to use desktop tools and the 'R-Team' gaming platform!",
+                "🎮 R-Team Gaming Suite: Play 5 real mini-games on PC (Brick Breaker, Cyber Snake, High-Low Guess, Crypto Clicker Miner, and Memory Matrix) to boost happiness and smarts!",
+                "🏢 10 Startable Businesses: Launch Coffee Roasteries, Food Trucks, Streetwear Brands, Tech Labs, Gyms, Breweries, Ad Agencies, Game Studios, and Auto Custom shops with manager hiring, warehouse storage, product lines, and finance tracking!",
+                "📱 Custom Smartphone Hardware: Found a Game & Tech Studio to design and manufacture your own custom smartphone models with international logistics shipping partners!",
+                "⚡ SimPhone Max & Real App Loading: Added titanium SimPhone Max (instant 0s load). SimPhone loads in 3s, SimPhone Pro loads in 2s. All apps unlocked on all models!",
+                "📶 WiFi Router & Age 18 Eviction: Under 18s live with parents with free home cooking and family WiFi. On your 18th birthday, you leave the nest and must acquire your own housing and set up a home WiFi router!",
+                "🥗 Balanced Food Meter: Hunger decay softened so you don't starve too fast. Under 18s are 100% fed by parents automatically!",
+                "📦 Net Worth & Appraisal Market: Total net worth tracking breakdown across liquid cash, physical assets, and corporate equity with instant item selling!",
+                "🌟 30+ New Random Life Events: Tons of unexpected career twists, school adventures, neighbor drama, and lottery moments!"
+            ),
+            isBigUpdate = true
+        ),
+        UpdateLogEntry(
+            version = "v2.3 - Market Category, SimBank Log, Multi-Jobs & Business Expansion",
+            releaseDate = "October 2026",
+            highlight = "Guaranteed Phone Market category, Bank statement logs, side jobs & categories, fancy supercars, business upgrades, and structured assets roadmap.",
+            changes = listOf(
+                "📱 Phone Always in Market: Removed all historical delays! SimPhone ($499) and SimPhone Pro ($999) have a dedicated top category in the Market available immediately.",
+                "🏦 SimBank Transaction Statement Log: Full transaction history inside the SimBank app displaying all wires, debt payoffs, loans, and salary deposits with dates & amounts!",
+                "💸 Wire to Any Contact: Wire money to mother, father, siblings, partners, friends, or custom recipients with relationship boost.",
+                "💼 Job Categories & Side Hustles: Hold multiple jobs simultaneously! Browse jobs across 9 categories (Tech, Medicine, Finance, Trades, Service, Aviation, Creative, Executive, and Side Gigs).",
+                "🏎️ Fancy Cars & Hypercars: Dealership expanded with Pagani Huayra ($3.2M), McLaren 720S ($395K), Rolls-Royce Phantom ($480K), Lamborghini Huracán ($280K), and BMW M4!",
+                "🍋 Business Era (Lemonade Stand): Fund and upgrade your stand from a wooden table to Deluxe Canopy (+30% customer foot traffic), buy bulk supplies, and adjust cup prices!",
+                "🥗 Food Hunger & Sustenance: Hunger meter drops each year. Buy groceries, meal boxes, or Michelin dinners to stay nourished and prevent starvation penalties!",
+                "🚗 SimRider Uber Driving on Pro: Drive passengers for $25-$60 realistic fares with 5-star ratings, capped per year.",
+                "🗺️ Structured Assets Roadmap: Planned feature to track cashflow statements, asset appreciation, and balance sheet capital."
+            ),
+            isBigUpdate = true
+        ),
+        UpdateLogEntry(
+            version = "v2.2 - Business Era, Bank Debt, Uber Gig & Food System",
+            releaseDate = "October 2026",
+            highlight = "Lemonade Stand business, Bank debt repayment & transfers, SimPhone Pro Uber rideshare, food hunger meter, and exotic luxury supercars.",
+            changes = listOf(
+                "🍋 Business Era Begins: Start your very first entrepreneurial venture—a Lemonade Stand ($75)! Set cup prices, buy citrus supplies, and earn realistic yearly profit.",
+                "🏦 SimBank Debt & Wire Transfers: Send money to any family/friend in the game and pay down loans/debt directly inside SimBank!",
+                "🚗 SimRider (Uber App on SimPhone Pro): Drive passengers on your phone to earn realistic fares ($25-$60) with passenger ratings, capped at 5 trips/year!",
+                "🥗 Food & Hunger System: Food decreases naturally each year. Purchase groceries, fast food, meal prep boxes, and Michelin dining in the market to stay healthy.",
+                "🏎️ Supercars & Exotic Hypercars: Added Mercedes-Maybach SUV, Ferrari V12 Supercar, Bugatti Chiron, and 1967 Shelby GT500!",
+                "💼 Categorized Job Market: Career listings organized by Tech, Medicine, Finance, Creative, Service, and Aviation with expanded salaries!",
+                "📱 Guaranteed SimPhone in Market: SimPhones and Tech are permanently available in the Tech Store."
+            ),
+            isBigUpdate = true
+        ),
+        UpdateLogEntry(
+            version = "v2.1 - Bug Fixes & Tech Store Expansion",
             releaseDate = "October 2026",
             highlight = "Fixed Age 0 bug, new Tech store category, SimBank transfers, and reverse/auto-scroll life feed.",
             changes = listOf(
@@ -52,7 +101,7 @@ object LifeEventGenerator {
                 "🏦 SimBank App: Transfer money to loved ones with 2-second wire transfer animation and 'Fine' confirmation popup.",
                 "📰 Progressive News: 50 world news events now unlock chronologically year-by-year from 1991 to 2026."
             ),
-            isBigUpdate = true
+            isBigUpdate = false
         ),
         UpdateLogEntry(
             version = "v2.0 - The Smartphone & Global Wealth Era [BIG UPDATE]",
@@ -166,18 +215,49 @@ object LifeEventGenerator {
         val entries = mutableListOf<LifeLogEntry>()
         val age = character.age
 
-        // SimPhone release event starting in 2001
-        if (character.currentYear >= 2001 && !character.phoneNotified) {
+        // SimPhone announcement - available in the Tech Market
+        if ((character.age >= 8 || character.currentYear >= 2000) && !character.phoneNotified) {
             character.phoneNotified = true
             entries.add(
                 LifeLogEntry(
                     age = age,
-                    title = "📱 The SimPhone is Released! (Year 2001)",
-                    description = "Year ${character.currentYear}: The revolutionary SimPhone has officially hit store shelves! You can now use your saved money in Assets to buy the SimPhone ($499) with News & SimBank, or SimPhone Pro ($999) which adds the World Richest 100 Leaderboard!",
+                    title = "📱 Mobile Tech & SimPhone in Store!",
+                    description = "Year ${character.currentYear}: The latest SimPhones are in stock! You can now visit the Phone market to buy the SimPhone ($499), SimPhone Pro ($999), or SimPhone Max ($1,499) with SimBank and SimRider Uber driving!",
                     emoji = "📱",
                     tag = LogTag.TECH,
                     happinessDelta = +10,
                     smartsDelta = +4
+                )
+            )
+        }
+
+        // Year 2003 PC Milestone
+        if (character.currentYear >= 2003 && !character.pcNotified) {
+            character.pcNotified = true
+            entries.add(
+                LifeLogEntry(
+                    age = age,
+                    title = "🖥️ The Personal Desktop PC Era (Year 2003)!",
+                    description = "Year ${character.currentYear}: Desktop personal computers have officially arrived! You can now buy a Desktop PC Workstation in the store. Access PC mode to use desktop apps and play 5+ real retro mini-games on R-Team!",
+                    emoji = "🖥️",
+                    tag = LogTag.TECH,
+                    happinessDelta = +14,
+                    smartsDelta = +8
+                )
+            )
+        }
+
+        // Under 18: parents feed you completely!
+        if (age < 18) {
+            character.hunger = 100
+            entries.add(
+                LifeLogEntry(
+                    age = age,
+                    title = "🍲 Home-Cooked Family Meals",
+                    description = "Your parents lovingly cooked healthy home dinners and breakfast for you all year. Hunger is fully refilled at 100%!",
+                    emoji = "🍲",
+                    tag = LogTag.HEALTH,
+                    happinessDelta = +4
                 )
             )
         }
@@ -206,7 +286,8 @@ object LifeEventGenerator {
             17 -> entries.add(LifeLogEntry(age, "High School Prom", "You dressed up in formal attire and danced the night away with classmates.", "💃", LogTag.RELATIONSHIP, happinessDelta = +10, looksDelta = +4))
             18 -> {
                 character.education = EducationLevel.HIGH_SCHOOL
-                entries.add(LifeLogEntry(age, "High School Graduation!", "You threw your cap into the air! You are now legally an adult with endless possibilities ahead.", "🎓", LogTag.MILESTONE, happinessDelta = +15, smartsDelta = +8))
+                entries.add(LifeLogEntry(age, "High School Graduation!", "You threw your cap into the air! You graduated high school.", "🎓", LogTag.MILESTONE, happinessDelta = +15, smartsDelta = +8))
+                entries.add(LifeLogEntry(age, "📦 18th Birthday: Left the Nest!", "Your parents congratulated you on adulthood and packed your luggage: 'You're 18 now! Time to build your independent life!' You must now acquire housing and set up your own WiFi router for internet.", "🚪", LogTag.MILESTONE, happinessDelta = +6))
             }
             21 -> entries.add(LifeLogEntry(age, "21st Birthday Bash", "Celebrated your milestone 21st birthday with friends! You feel on top of the world.", "🥂", LogTag.MILESTONE, happinessDelta = +14))
             30 -> entries.add(LifeLogEntry(age, "The Big 3-0!", "You celebrated your 30th birthday. You feel mature, grounded, and ambitious.", "✨", LogTag.MILESTONE, happinessDelta = +8, smartsDelta = +3))
@@ -230,7 +311,15 @@ object LifeEventGenerator {
                 LifeLogEntry(age, "School Field Trip", "Visited the natural history museum and saw giant dinosaur fossils.", "🦕", LogTag.EDUCATION, smartsDelta = +3),
                 LifeLogEntry(age, "Summer Vacation", "Spent two sunny weeks swimming at the lake and eating ice cream.", "🍦", LogTag.GENERAL, happinessDelta = +6, healthDelta = +3),
                 LifeLogEntry(age, "Library Reading Challenge", "Read five thick mystery novels in a row during the winter break.", "📖", LogTag.EDUCATION, smartsDelta = +5),
-                LifeLogEntry(age, "Sports Tournament", "Scored the winning goal for your school team in the championship match!", "⚽", LogTag.HEALTH, healthDelta = +5, happinessDelta = +8)
+                LifeLogEntry(age, "Sports Tournament", "Scored the winning goal for your school team in the championship match!", "⚽", LogTag.HEALTH, healthDelta = +5, happinessDelta = +8),
+                LifeLogEntry(age, "Treehouse Construction", "Built an awesome wooden treehouse in the backyard with neighborhood pals.", "🪵", LogTag.GENERAL, happinessDelta = +8, smartsDelta = +3),
+                LifeLogEntry(age, "Arcade High Score", "Set the all-time number one high score on the arcade pinball machine at the mall!", "👾", LogTag.GENERAL, happinessDelta = +10, smartsDelta = +3),
+                LifeLogEntry(age, "Math Olympiad Bronze", "Placed 3rd in the regional youth mathematics tournament!", "📐", LogTag.EDUCATION, smartsDelta = +8, happinessDelta = +4),
+                LifeLogEntry(age, "Adopted a Stray Kitten", "Found a gentle purring kitten on the front porch and convinced parents to give it milk.", "🐱", LogTag.RELATIONSHIP, happinessDelta = +9),
+                LifeLogEntry(age, "Campfire Ghost Stories", "Roasted marshmallows over a campfire and told spooky stories late into the night.", "🔥", LogTag.GENERAL, happinessDelta = +6),
+                LifeLogEntry(age, "Garage Band Jam Session", "Played loud drums in the garage with your friends until the neighbors knocked.", "🥁", LogTag.GENERAL, happinessDelta = +7, looksDelta = +2),
+                LifeLogEntry(age, "Skateboard Trick Mastered", "Landed an ollie down a 4-stair concrete set without skinning your knees.", "🛹", LogTag.HEALTH, healthDelta = +3, looksDelta = +3, happinessDelta = +7),
+                LifeLogEntry(age, "Comic Book Collection", "Traded vintage superhero issues at the local comic shop and found a rare mint foil edition.", "🦸", LogTag.GENERAL, happinessDelta = +5, moneyDelta = 25)
             )
             age < 65 -> listOf(
                 LifeLogEntry(age, "Healthy Habit", "Started drinking green smoothies and jogging three mornings a week.", "🥗", LogTag.HEALTH, healthDelta = +6, looksDelta = +3),
@@ -238,13 +327,28 @@ object LifeEventGenerator {
                 LifeLogEntry(age, "Home Improvement", "Repainted your living room and organized your bookshelf.", "🛋️", LogTag.GENERAL, happinessDelta = +4),
                 LifeLogEntry(age, "Tax Return Bonus", "The revenue agency sent you a nice unexpected tax refund.", "💰", LogTag.WEALTH, moneyDelta = Random.nextLong(400, 1500)),
                 LifeLogEntry(age, "Cooked Gourmet Dinner", "Mastered a delicate French soufflé recipe from scratch without burning it.", "🍳", LogTag.GENERAL, happinessDelta = +5, smartsDelta = +2),
-                LifeLogEntry(age, "Gym Transformation", "Hit a personal weightlifting record at the fitness club.", "💪", LogTag.HEALTH, healthDelta = +5, looksDelta = +4)
+                LifeLogEntry(age, "Gym Transformation", "Hit a personal weightlifting record at the fitness club.", "💪", LogTag.HEALTH, healthDelta = +5, looksDelta = +4),
+                LifeLogEntry(age, "Stock Market Dividend", "A blue-chip investment company paid out unexpected shareholder dividends.", "📈", LogTag.WEALTH, moneyDelta = Random.nextLong(350, 1800)),
+                LifeLogEntry(age, "Viral Social Post", "A funny picture you took went viral online, netting you thousands of shares!", "📱", LogTag.GENERAL, happinessDelta = +12, looksDelta = +3),
+                LifeLogEntry(age, "Neighborhood Block Party", "Organized a summer barbecue on your street with grilled burgers and live music.", "🍔", LogTag.RELATIONSHIP, happinessDelta = +9),
+                LifeLogEntry(age, "Stargazing Meteor Shower", "Drove out to the dark countryside and watched 50 shooting stars streak across the milky way.", "🌠", LogTag.GENERAL, happinessDelta = +8, smartsDelta = +2),
+                LifeLogEntry(age, "Marathon Finisher", "Trained for 6 months and completed a 26-mile marathon! What an incredible triumph.", "🏅", LogTag.HEALTH, healthDelta = +12, happinessDelta = +15),
+                LifeLogEntry(age, "Antique Find at Flea Market", "Bought a vintage dusty oil painting for $20 that turned out to be an authentic collectible!", "🖼️", LogTag.WEALTH, moneyDelta = 850, happinessDelta = +8),
+                LifeLogEntry(age, "Concert in the Park", "Listened to an acoustic orchestra concert beneath glowing twilight lanterns.", "🎻", LogTag.GENERAL, happinessDelta = +8),
+                LifeLogEntry(age, "Wine Tasting Masterclass", "Learned how to detect oak, berry, and spice notes from a master sommelier.", "🍷", LogTag.GENERAL, happinessDelta = +6, smartsDelta = +3),
+                LifeLogEntry(age, "Adopted Golden Retriever", "Brought home an affectionate puppy that instantly greeted you with tail wags.", "🐕", LogTag.RELATIONSHIP, happinessDelta = +14),
+                LifeLogEntry(age, "Spontaneous Beach Day", "Spent a breezy Saturday riding ocean waves and reading on a hammock.", "🏖️", LogTag.GENERAL, happinessDelta = +9, healthDelta = +4),
+                LifeLogEntry(age, "Won Local Trivia Night", "Led your pub trivia team to victory by knowing the capital city of Madagascar!", "🧠", LogTag.EDUCATION, smartsDelta = +6, moneyDelta = 150)
             )
             else -> listOf(
                 LifeLogEntry(age, "Gardening Season", "Your backyard heirloom tomatoes and hydrangeas bloomed beautifully.", "🌻", LogTag.GENERAL, happinessDelta = +6),
                 LifeLogEntry(age, "Bingo Night Winner", "Shouted 'BINGO!' at the community recreation center and won a $100 gift basket.", "🎯", LogTag.GENERAL, happinessDelta = +8, moneyDelta = 100),
                 LifeLogEntry(age, "Family Reunion", "Hosted a lively weekend barbecue where your relatives shared funny memories.", "👨‍👩‍👧‍👦", LogTag.RELATIONSHIP, happinessDelta = +12),
-                LifeLogEntry(age, "Peaceful Walk in the Park", "Fed ducks by the willow pond on a crisp autumn morning.", "🦆", LogTag.HEALTH, healthDelta = +3, happinessDelta = +5)
+                LifeLogEntry(age, "Peaceful Walk in the Park", "Fed ducks by the willow pond on a crisp autumn morning.", "🦆", LogTag.HEALTH, healthDelta = +3, happinessDelta = +5),
+                LifeLogEntry(age, "Grandchildren Storytime", "Gathered the young ones on your lap and recounted adventurous tales from your youth.", "📖", LogTag.RELATIONSHIP, happinessDelta = +15),
+                LifeLogEntry(age, "Golden Memories Album", "Scanned old family photographs into a leather album with handwritten notes.", "📷", LogTag.GENERAL, happinessDelta = +9),
+                LifeLogEntry(age, "Morning Tai Chi", "Practiced gentle balance exercises in the garden at sunrise.", "🧘", LogTag.HEALTH, healthDelta = +6, happinessDelta = +5),
+                LifeLogEntry(age, "Chess Tournament Champion", "Checkmated the reigning senior chess club champion with a brilliant knight fork!", "♟️", LogTag.EDUCATION, smartsDelta = +7, happinessDelta = +10)
             )
         }
         return pool.random()
@@ -825,6 +929,7 @@ object LifeEventGenerator {
             salary = 32000L,
             minAge = 18,
             minSmarts = 30,
+            category = "Service & Retail",
             requiredDegree = Degree.NONE,
             interviewQuestion = "How do you handle peak rush hour when fifteen orders queue up at once?",
             interviewChoices = listOf(
@@ -840,6 +945,7 @@ object LifeEventGenerator {
             salary = 52000L,
             minAge = 18,
             minSmarts = 50,
+            category = "Creative & Media",
             requiredDegree = Degree.NONE,
             interviewQuestion = "A client asks to 'make the logo bigger and pop more'. How do you respond?",
             interviewChoices = listOf(
@@ -855,11 +961,28 @@ object LifeEventGenerator {
             salary = 95000L,
             minAge = 20,
             minSmarts = 65,
+            category = "Tech & Engineering",
             requiredDegree = Degree.COMPUTER_SCIENCE,
             interviewQuestion = "What is the primary advantage of writing automated unit tests?",
             interviewChoices = listOf(
                 JobInterviewChoice("Catches regressions early, ensures reliability, and enables fearless refactoring", true, "Spot-on technical answer! Welcome to the engineering team!"),
                 JobInterviewChoice("It gives developers an excuse to drink more coffee while tests compile", false, "Funny, but failed the technical screening.")
+            )
+        ),
+        JobListing(
+            id = "job_ai_architect",
+            title = "Lead AI Systems Architect",
+            company = "Cognitive Nexus Labs",
+            emoji = "🤖",
+            salary = 165000L,
+            minAge = 24,
+            minSmarts = 80,
+            category = "Tech & Engineering",
+            requiredDegree = Degree.COMPUTER_SCIENCE,
+            interviewQuestion = "How do you prevent catastrophic forgetting in fine-tuning deep transformer models?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Employ low-rank adaptation (LoRA) and replay regularization buffers", true, "Extraordinary technical depth! You will head our core research division!"),
+                JobInterviewChoice("Re-train the model from scratch every time you click enter", false, "Completely unfeasible computational approach.")
             )
         ),
         JobListing(
@@ -870,11 +993,44 @@ object LifeEventGenerator {
             salary = 88000L,
             minAge = 21,
             minSmarts = 65,
+            category = "Business & Finance",
             requiredDegree = Degree.BUSINESS,
             interviewQuestion = "How do you assess whether a company's dividend payout is sustainable?",
             interviewChoices = listOf(
                 JobInterviewChoice("Analyze free cash flow coverage ratio and debt obligations", true, "Impressive quantitative acumen. You're hired!"),
                 JobInterviewChoice("Check if their stock ticker symbol has lucky letters", false, "Wall Street is not a casino for superstitions.")
+            )
+        ),
+        JobListing(
+            id = "job_hedge_fund_partner",
+            title = "Hedge Fund Managing Partner",
+            company = "Citadel Crest Partners",
+            emoji = "📈",
+            salary = 420000L,
+            minAge = 28,
+            minSmarts = 85,
+            category = "Business & Finance",
+            requiredDegree = Degree.BUSINESS,
+            interviewQuestion = "What strategy hedges geopolitical tail-risk during sudden global currency shocks?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Diversify into uncorrelated commodities, sovereign short-duration notes, and volatility index straddles", true, "Masterful portfolio risk management! Welcome to the partnership!"),
+                JobInterviewChoice("Put all investor capital into meme penny stocks", false, "You would be disbarred within 24 hours.")
+            )
+        ),
+        JobListing(
+            id = "job_nurse",
+            title = "Registered Emergency Nurse",
+            company = "Metropolitan Memorial Hospital",
+            emoji = "💉",
+            salary = 78000L,
+            minAge = 21,
+            minSmarts = 65,
+            category = "Healthcare & Medicine",
+            requiredDegree = Degree.MEDICINE,
+            interviewQuestion = "How do you prioritize patient intake in a bustling trauma triage center?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Follow ABC triage protocol (Airway, Breathing, Circulation) with calm decisiveness", true, "Vital clinical skill. Welcome to the trauma unit!"),
+                JobInterviewChoice("Take whoever shouts the loudest first", false, "Dangerous triage failure.")
             )
         ),
         JobListing(
@@ -885,6 +1041,7 @@ object LifeEventGenerator {
             salary = 180000L,
             minAge = 26,
             minSmarts = 80,
+            category = "Healthcare & Medicine",
             requiredDegree = Degree.MEDICINE,
             interviewQuestion = "A patient comes in with high fever and sudden rashes. What is your initial protocol?",
             interviewChoices = listOf(
@@ -900,21 +1057,192 @@ object LifeEventGenerator {
             salary = 140000L,
             minAge = 23,
             minSmarts = 70,
+            category = "Aviation & Transport",
             requiredDegree = Degree.NONE,
             interviewQuestion = "Severe turbulence hits mid-flight with thunderheads ahead. What is your priority?",
             interviewChoices = listOf(
                 JobInterviewChoice("Turn on seatbelt signs, notify ATC for altitude rerouting, and ensure passenger safety", true, "Flawless aeronautical decision making. You're our new First Officer!"),
                 JobInterviewChoice("Close your eyes and let autopilot handle whatever happens", false, "Flight license revoked instantly.")
             )
+        ),
+        JobListing(
+            id = "job_cyber_security",
+            title = "Cyber Security Specialist",
+            company = "Sentinel Shield Defense",
+            emoji = "🛡️",
+            salary = 118000L,
+            minAge = 21,
+            minSmarts = 70,
+            category = "Tech & Engineering",
+            requiredDegree = Degree.COMPUTER_SCIENCE,
+            interviewQuestion = "How do you mitigate zero-day exploit vulnerabilities in infrastructure?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Isolate compromised subnetworks, revoke compromised access tokens, and deploy memory patches", true, "Masterclass in incident response! Hired!"),
+                JobInterviewChoice("Unplug the server power cord and go home for the weekend", false, "Catastrophic security failure.")
+            )
+        ),
+        JobListing(
+            id = "job_electrician",
+            title = "Licensed Journeyman Electrician",
+            company = "VoltCraft Electrical Co.",
+            emoji = "⚡",
+            salary = 68000L,
+            minAge = 18,
+            minSmarts = 40,
+            category = "Trades & Construction",
+            requiredDegree = Degree.NONE,
+            interviewQuestion = "Which safety equipment is non-negotiable before probing a commercial 480V circuit breaker panel?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Arc-flash rated face shield, voltage meter check, and insulated 1000V gloves", true, "Safety first! Welcome to the crew!"),
+                JobInterviewChoice("Touching both copper bus bars with bare hands to see if it tingles", false, "Immediate disqualification.")
+            )
+        ),
+        JobListing(
+            id = "job_plumber",
+            title = "Master Plumber",
+            company = "FlowRight Pipe Systems",
+            emoji = "🔧",
+            salary = 75000L,
+            minAge = 19,
+            minSmarts = 40,
+            category = "Trades & Construction",
+            requiredDegree = Degree.NONE,
+            interviewQuestion = "What slope grade is required for standard 3-inch wastewater pipe drainage?",
+            interviewChoices = listOf(
+                JobInterviewChoice("One-quarter inch per linear foot for steady gravity drainage", true, "Code compliant knowledge! You're hired!"),
+                JobInterviewChoice("Plumbing pipes don't need any slope, water flows backwards", false, "Fails basic plumbing physics.")
+            )
+        ),
+        JobListing(
+            id = "job_pharmacist",
+            title = "Licensed Clinical Pharmacist",
+            company = "Apothecary Health Network",
+            emoji = "💊",
+            salary = 128000L,
+            minAge = 24,
+            minSmarts = 75,
+            category = "Healthcare & Medicine",
+            requiredDegree = Degree.MEDICINE,
+            interviewQuestion = "How do you handle a suspected contraindication between two prescribed medications?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Flag the critical interaction, consult clinical pharmacology databases, and call the physician", true, "Exemplary pharmaceutical diligence! Hired!"),
+                JobInterviewChoice("Dispense both anyway and let the patient experiment", false, "License revoked for gross malpractice.")
+            )
+        ),
+        JobListing(
+            id = "job_cpa",
+            title = "Certified Public Accountant",
+            company = "KPMG Global Tax Partners",
+            emoji = "📑",
+            salary = 82000L,
+            minAge = 21,
+            minSmarts = 65,
+            category = "Business & Finance",
+            requiredDegree = Degree.BUSINESS,
+            interviewQuestion = "What defines GAAP compliance for revenue recognition?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Recognize revenue when performance obligations are satisfied by transferring goods or services", true, "Flawless audit knowledge! Welcome aboard!"),
+                JobInterviewChoice("Count money before the customer even pays", false, "Tax fraud violation.")
+            )
+        ),
+        JobListing(
+            id = "job_bartender",
+            title = "Night Club Mixologist",
+            company = "Velvet Lounge Nightclub",
+            emoji = "🍸",
+            salary = 46000L,
+            minAge = 21,
+            minSmarts = 30,
+            category = "Service & Hospitality",
+            requiredDegree = Degree.NONE,
+            interviewQuestion = "A customer has had too many drinks and demands another cocktail. What do you do?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Cut them off with tactful courtesy, offer water, and arrange a taxi home", true, "Professional and responsible mixology. Welcome to Velvet Lounge!"),
+                JobInterviewChoice("Double the tequila shot to get a bigger tip", false, "Liquor law violation.")
+            )
+        ),
+        JobListing(
+            id = "job_animator",
+            title = "3D Game Character Animator",
+            company = "Epic Pixel Interactive",
+            emoji = "🎬",
+            salary = 74000L,
+            minAge = 19,
+            minSmarts = 50,
+            category = "Creative & Media",
+            requiredDegree = Degree.ARTS,
+            interviewQuestion = "What is the key principle for giving weight and momentum to a character's run cycle?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Anticipation, squash-and-stretch, and believable follow-through arcs", true, "Dynamic animation talent! Welcome to the game studio!"),
+                JobInterviewChoice("Make the character hover stiffly with no joint movements", false, "Unconvincing robotic motion.")
+            )
+        ),
+        JobListing(
+            id = "job_ceo",
+            title = "Chief Executive Officer (CEO)",
+            company = "Aegis Global Holdings",
+            emoji = "👑",
+            salary = 580000L,
+            minAge = 30,
+            minSmarts = 85,
+            category = "Executive & Leadership",
+            requiredDegree = Degree.BUSINESS,
+            interviewQuestion = "The company faces market disruption from new competitors. What is your vision?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Re-align capital into R&D innovation, streamline operating efficiency, and expand into emergent markets", true, "Visionary leadership! You have been appointed CEO!"),
+                JobInterviewChoice("Panic, fire the engineers, and sell corporate assets at clearance prices", false, "Board of Directors vetoed your candidacy.")
+            )
+        ),
+        JobListing(
+            id = "job_side_tutor",
+            title = "Weekend Academic Tutor",
+            company = "Apex Learning Academy",
+            emoji = "📚",
+            salary = 18000L,
+            minAge = 16,
+            minSmarts = 55,
+            category = "Part-Time & Side Gigs",
+            requiredDegree = Degree.NONE,
+            interviewQuestion = "A student is struggling with algebra fundamentals. How do you coach them?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Break complex equations into visual step-by-step building blocks and encourage questions", true, "Patient and inspiring mentorship. Hired for weekend tutoring!"),
+                JobInterviewChoice("Tell them they aren't smart enough and should give up", false, "Unacceptable coaching behavior.")
+            )
+        ),
+        JobListing(
+            id = "job_side_delivery",
+            title = "Evening Courier / Delivery",
+            company = "SwiftDrop Logistics",
+            emoji = "🛵",
+            salary = 22000L,
+            minAge = 18,
+            minSmarts = 25,
+            category = "Part-Time & Side Gigs",
+            requiredDegree = Degree.NONE,
+            interviewQuestion = "How do you navigate urban deliveries during heavy rain and traffic?",
+            interviewChoices = listOf(
+                JobInterviewChoice("Use GPS route optimization, secure weather-resistant bags, and drive safely", true, "Reliable courier! Welcome to the SwiftDrop dispatch team!"),
+                JobInterviewChoice("Throw packages over fences from the street without stopping", false, "Delivery contract denied.")
+            )
         )
     )
 
-    // ASSETS
+    // ASSETS - CARS & LUXURY SUPERCARS
     val CARS_FOR_SALE = listOf(
-        Asset(type = AssetType.CAR, name = "Used Honda Civic 2012", value = 4500L, annualMaintenance = 400L),
-        Asset(type = AssetType.CAR, name = "Toyota Camry 2020", value = 18000L, annualMaintenance = 600L),
-        Asset(type = AssetType.CAR, name = "Tesla Model 3 Performance", value = 48000L, annualMaintenance = 800L),
-        Asset(type = AssetType.CAR, name = "Porsche 911 Carrera", value = 115000L, annualMaintenance = 2500L)
+        Asset(type = AssetType.CAR, name = "Used Hatchback 2012", value = 3500L, annualMaintenance = 300L),
+        Asset(type = AssetType.CAR, name = "Economy Sedan 2018", value = 12000L, annualMaintenance = 450L),
+        Asset(type = AssetType.CAR, name = "Toyota Camry Sedan 2022", value = 22000L, annualMaintenance = 500L),
+        Asset(type = AssetType.CAR, name = "Tesla Model 3 Long Range", value = 48000L, annualMaintenance = 650L),
+        Asset(type = AssetType.CAR, name = "BMW M4 Competition Coupe", value = 78000L, annualMaintenance = 1600L),
+        Asset(type = AssetType.CAR, name = "Porsche 911 Carrera S", value = 125000L, annualMaintenance = 2400L),
+        Asset(type = AssetType.CAR, name = "Mercedes-Maybach Luxury SUV", value = 210000L, annualMaintenance = 3800L),
+        Asset(type = AssetType.CAR, name = "1967 Shelby GT500 Classic", value = 260000L, annualMaintenance = 2800L),
+        Asset(type = AssetType.CAR, name = "Lamborghini Huracán Evo", value = 280000L, annualMaintenance = 5200L),
+        Asset(type = AssetType.CAR, name = "Ferrari V12 Berlinetta", value = 365000L, annualMaintenance = 6800L),
+        Asset(type = AssetType.CAR, name = "McLaren 720S Spider", value = 395000L, annualMaintenance = 7500L),
+        Asset(type = AssetType.CAR, name = "Rolls-Royce Phantom", value = 480000L, annualMaintenance = 8500L),
+        Asset(type = AssetType.CAR, name = "Bugatti Chiron Hypercar", value = 2800000L, annualMaintenance = 28000L),
+        Asset(type = AssetType.CAR, name = "Pagani Huayra Exotic", value = 3200000L, annualMaintenance = 32000L)
     )
 
     val HOUSES_FOR_SALE = listOf(
@@ -939,7 +1267,28 @@ object LifeEventGenerator {
         Asset(type = AssetType.PHONE, name = "SimPhone", value = 499L, annualMaintenance = 30L),
         Asset(type = AssetType.PHONE, name = "SimPhone Pro", value = 999L, annualMaintenance = 60L),
         Asset(type = AssetType.TECH, name = "Pro Developer Laptop", value = 850L, annualMaintenance = 40L),
+        Asset(type = AssetType.TECH, name = "High-Performance Tablet", value = 650L, annualMaintenance = 25L),
         Asset(type = AssetType.TECH, name = "Smart Health Watch", value = 299L, annualMaintenance = 15L),
-        Asset(type = AssetType.TECH, name = "Ultra 4K Gaming Console", value = 499L, annualMaintenance = 20L)
+        Asset(type = AssetType.TECH, name = "Ultra 4K Gaming Console", value = 499L, annualMaintenance = 20L),
+        Asset(type = AssetType.TECH, name = "VR Spatial Headset", value = 1100L, annualMaintenance = 45L),
+        Asset(type = AssetType.TECH, name = "Noise-Cancelling Smart Headphones", value = 350L, annualMaintenance = 15L)
+    )
+
+    // FOOD & NUTRITION ITEMS
+    val FOOD_ITEMS = listOf(
+        FoodItem("food_cart", "Street Cart Pretzels & Soda", 6L, hungerRestore = 15, healthBonus = -1, happinessBonus = +2, "🥨", "Quick street snack to curb morning cravings."),
+        FoodItem("food_snack", "Fast Food Value Meal", 14L, hungerRestore = 35, healthBonus = -2, happinessBonus = +3, "🍔", "A quick burger, fries, and cold fountain soda."),
+        FoodItem("food_grocery", "Fresh Supermarket Groceries", 48L, hungerRestore = 60, healthBonus = +4, happinessBonus = +3, "🥗", "Farm fresh vegetables, chicken, eggs, pasta, and fruits."),
+        FoodItem("food_organic", "Organic Chef Meal Prep Box", 115L, hungerRestore = 85, healthBonus = +8, happinessBonus = +6, "🍱", "Gourmet dietitian-curated balanced meals delivered for the week."),
+        FoodItem("food_dining", "Michelin 3-Star Tasting Menu", 290L, hungerRestore = 100, healthBonus = +10, happinessBonus = +20, "🍷", "Multi-course culinary masterpiece with fine dining wine pairing.")
+    )
+
+    // UBER RIDESHARE TRIPS FOR SIMPHONE PRO
+    val UBER_TRIPS = listOf(
+        UberTrip("Sarah K.", "Downtown Financial District", 34L, 6L, 5.0f, "👩‍💼", "Very smooth ride and great music choice!"),
+        UberTrip("Marcus T.", "Airport Terminal 3 Departures", 58L, 12L, 4.9f, "🧳", "Arrived right on time for my flight. Awesome driver!"),
+        UberTrip("Emily & Dave", "Westside Concert Arena", 42L, 8L, 5.0f, "🎸", "Super friendly and got us through traffic quickly!"),
+        UberTrip("Grandma Helen", "Community Botanical Gardens", 24L, 5L, 5.0f, "👵", "A very polite young driver who helped with my purse."),
+        UberTrip("Kevin L.", "Tech Innovation Campus", 38L, 7L, 4.8f, "💻", "Great conversation about software and startups!")
     )
 }

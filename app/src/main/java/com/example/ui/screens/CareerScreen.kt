@@ -3,11 +3,12 @@ package com.example.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,11 +32,27 @@ fun CareerScreen(
     onAskForRaise: () -> Unit,
     onResign: () -> Unit,
     onApplyJob: (JobListing) -> Unit,
+    onApplySideJob: (JobListing) -> Unit,
+    onResignSideJob: (String) -> Unit,
     onSelectGig: (ClientGig) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val jobs = LifeEventGenerator.AVAILABLE_JOBS
     val clientGigs = LifeEventGenerator.CLIENT_GIGS
+    var selectedCategory by remember { mutableStateOf("All") }
+    val categories = listOf(
+        "All",
+        "Tech & Engineering",
+        "Healthcare & Medicine",
+        "Business & Finance",
+        "Creative & Media",
+        "Service & Hospitality",
+        "Trades & Construction",
+        "Aviation & Transport",
+        "Executive & Leadership",
+        "Part-Time & Side Gigs"
+    )
+    val filteredJobs = if (selectedCategory == "All") jobs else jobs.filter { it.category.equals(selectedCategory, ignoreCase = true) }
 
     LazyColumn(
         modifier = modifier
@@ -178,6 +195,55 @@ fun CareerScreen(
             }
         }
 
+        // Section: Active Side Hustles
+        if (character.sideJobs.isNotEmpty()) {
+            item {
+                Text(
+                    text = "💼 Active Side Hustles (${character.sideJobs.size}/2)",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            items(character.sideJobs, key = { "side_${it.id}" }) { sideJob ->
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = sideJob.emoji, fontSize = 24.sp)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = sideJob.title,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "${sideJob.company} • +$${sideJob.salary}/yr net",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = LifeGold
+                            )
+                        }
+                        OutlinedButton(
+                            onClick = { onResignSideJob(sideJob.id) },
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.height(34.dp)
+                        ) {
+                            Text("Resign", fontSize = 10.sp)
+                        }
+                    }
+                }
+            }
+        }
+
         // Section: Client & Freelance Gigs
         item {
             Column {
@@ -263,20 +329,39 @@ fun CareerScreen(
 
         // Section: Job Board Openings
         item {
-            Text(
-                text = "💼 Job Board / Permanent Careers",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 4.dp)
-            )
+            Column {
+                Text(
+                    text = "💼 Job Board / Permanent & Side Careers",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(categories) { cat ->
+                        FilterChip(
+                            selected = selectedCategory == cat,
+                            onClick = { selectedCategory = cat },
+                            label = { Text(cat, fontSize = 11.sp) }
+                        )
+                    }
+                }
+            }
         }
 
-        items(jobs, key = { it.id }) { job ->
+        items(filteredJobs, key = { it.id }) { job ->
             val meetsAge = character.age >= job.minAge
             val meetsSmarts = character.smarts >= job.minSmarts
             val meetsDegree = job.requiredDegree == Degree.NONE || character.degree == job.requiredDegree
             val canApply = meetsAge && meetsSmarts && meetsDegree
+            val isCurrentPrimary = character.occupation.title == job.title
+            val isCurrentSide = character.sideJobs.any { it.id == job.id }
 
             Surface(
                 modifier = Modifier
@@ -324,17 +409,32 @@ fun CareerScreen(
                         }
                     }
 
-                    Button(
-                        onClick = { onApplyJob(job) },
-                        enabled = canApply,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald),
-                        modifier = Modifier.testTag("apply_job_${job.id}")
-                    ) {
-                        Text(
-                            text = if (canApply) "Apply" else "Locked",
-                            fontSize = 11.sp
-                        )
+                    if (isCurrentPrimary) {
+                        Text("Current 🏆", fontSize = 11.sp, color = LifeEmerald, fontWeight = FontWeight.Bold)
+                    } else if (isCurrentSide) {
+                        Text("Side Job 💼", fontSize = 11.sp, color = LifeGold, fontWeight = FontWeight.Bold)
+                    } else if (!canApply) {
+                        Text("Locked 🔒", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Button(
+                                onClick = { onApplyJob(job) },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald),
+                                modifier = Modifier.testTag("apply_job_${job.id}")
+                            ) {
+                                Text("Primary", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
+                            if (character.sideJobs.size < 2) {
+                                OutlinedButton(
+                                    onClick = { onApplySideJob(job) },
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.testTag("apply_side_job_${job.id}")
+                                ) {
+                                    Text("+ Side", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                     }
                 }
             }

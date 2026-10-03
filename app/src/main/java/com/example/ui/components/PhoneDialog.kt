@@ -32,10 +32,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.data.generators.LifeEventGenerator
 import com.example.data.generators.NewsAndRichDatabase
 import com.example.data.model.Character
 import com.example.data.model.NewsArticle
 import com.example.data.model.Relationship
+import com.example.data.model.UberTrip
 import com.example.ui.theme.LifeEmerald
 import com.example.ui.theme.LifeGold
 import com.example.ui.theme.LifeRose
@@ -48,6 +50,7 @@ enum class SimPhoneApp {
     HOME,
     NEWS,
     BANK,
+    UBER,
     RICHEST,
     SETTINGS
 }
@@ -57,6 +60,9 @@ fun PhoneDialog(
     character: Character,
     onSendMoney: (recipient: String, amount: Long) -> Unit,
     onReceiveMoney: (amount: Long, source: String) -> Unit,
+    onPayDebt: (amount: Long) -> Unit,
+    onTakeLoan: (amount: Long) -> Unit,
+    onCompleteUberRide: (trip: UberTrip) -> Unit,
     onBuyPhoneShortcut: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -161,6 +167,7 @@ fun PhoneDialog(
                                     text = when (activeApp) {
                                         SimPhoneApp.NEWS -> "Chronicle News"
                                         SimPhoneApp.BANK -> "SimBank"
+                                        SimPhoneApp.UBER -> "SimRider (Uber)"
                                         SimPhoneApp.RICHEST -> "Richest 100"
                                         SimPhoneApp.SETTINGS -> "SimPhone Specs"
                                         else -> ""
@@ -194,7 +201,6 @@ fun PhoneDialog(
                         // App Content Area
                         Box(modifier = Modifier.weight(1f)) {
                             if (!character.hasPhone) {
-                                // Not owned yet
                                 NoPhoneOwnedView(
                                     character = character,
                                     onBuyPhoneShortcut = onBuyPhoneShortcut
@@ -220,8 +226,24 @@ fun PhoneDialog(
                                             character = character,
                                             currencyFormatter = currencyFormatter,
                                             onSendMoney = onSendMoney,
-                                            onReceiveMoney = onReceiveMoney
+                                            onReceiveMoney = onReceiveMoney,
+                                            onPayDebt = onPayDebt,
+                                            onTakeLoan = onTakeLoan
                                         )
+                                    }
+                                    SimPhoneApp.UBER -> {
+                                        if (character.hasSimPhonePro) {
+                                            PhoneUberAppScreen(
+                                                character = character,
+                                                onCompleteUberRide = onCompleteUberRide
+                                            )
+                                        } else {
+                                            ProFeatureLockedView(
+                                                featureTitle = "SimRider Rideshare App",
+                                                featureDescription = "The SimRider Uber driving app is exclusively available on SimPhone Pro ($999). Drive passengers to earn realistic fares ($25-$60)!",
+                                                onUpgradeClick = onBuyPhoneShortcut
+                                            )
+                                        }
                                     }
                                     SimPhoneApp.RICHEST -> {
                                         if (character.hasSimPhonePro) {
@@ -231,6 +253,8 @@ fun PhoneDialog(
                                             )
                                         } else {
                                             ProFeatureLockedView(
+                                                featureTitle = "Richest 100 Leaderboard",
+                                                featureDescription = "The Forbes 100 Richest People Leaderboard is exclusively available on SimPhone Pro ($999). Track your ranking among world billionaires!",
                                                 onUpgradeClick = onBuyPhoneShortcut
                                             )
                                         }
@@ -294,11 +318,7 @@ private fun NoPhoneOwnedView(
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = if (character.currentYear < 2001) {
-                "SimPhones have not hit the market yet in Year ${character.currentYear}. They release worldwide in Year 2001!"
-            } else {
-                "You haven't bought a SimPhone yet. You must use your own earned money to purchase one!"
-            },
+            text = "Purchase a SimPhone ($499) or SimPhone Pro ($999) from the Tech Store in Activities/Assets!",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -306,14 +326,12 @@ private fun NoPhoneOwnedView(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (character.currentYear >= 2001) {
-            Button(
-                onClick = onBuyPhoneShortcut,
-                colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("Browse SimPhones in Assets", fontWeight = FontWeight.Bold)
-            }
+        Button(
+            onClick = onBuyPhoneShortcut,
+            colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text("Browse Tech Store 🛒", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -331,7 +349,7 @@ private fun PhoneHomeAppGrid(
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Phone Lock/Home Header Widget
+        // Phone Home Header Widget
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -353,6 +371,14 @@ private fun PhoneHomeAppGrid(
                     fontWeight = FontWeight.Black,
                     color = LifeGold
                 )
+                if (character.debt > 0) {
+                    Text(
+                        text = "Debt: ${character.currencySymbol}${character.debt}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = LifeRose,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 Text(
                     text = "Model: ${character.phoneModelName}",
                     style = MaterialTheme.typography.labelSmall,
@@ -361,7 +387,7 @@ private fun PhoneHomeAppGrid(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Text(
             text = "INSTALLED APPS",
@@ -371,9 +397,9 @@ private fun PhoneHomeAppGrid(
             letterSpacing = 1.sp
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // 2x2 Phone App Icon Grid
+        // Row 1: News & SimBank
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -389,18 +415,27 @@ private fun PhoneHomeAppGrid(
             SimPhoneAppIcon(
                 title = "SimBank",
                 emoji = "🏦",
-                badge = "Wire Money",
+                badge = if (character.debt > 0) "Debt Active" else "Wire Money",
                 bgGradient = listOf(Color(0xFF059669), Color(0xFF047857)),
                 onClick = { onLaunchApp(SimPhoneApp.BANK) }
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
+        // Row 2: SimRider (Uber) & Richest 100
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            SimPhoneAppIcon(
+                title = "SimRider",
+                emoji = "🚗",
+                badge = if (character.hasSimPhonePro) "${5 - character.rideshareTripsThisYear} rides left" else "Pro Req.",
+                bgGradient = if (character.hasSimPhonePro) listOf(Color(0xFF1E293B), Color(0xFF0F172A)) else listOf(Color(0xFF475569), Color(0xFF334155)),
+                onClick = { onLaunchApp(SimPhoneApp.UBER) }
+            )
+
             SimPhoneAppIcon(
                 title = "Richest 100",
                 emoji = "🏆",
@@ -408,7 +443,15 @@ private fun PhoneHomeAppGrid(
                 bgGradient = if (character.hasSimPhonePro) listOf(Color(0xFFD97706), Color(0xFFB45309)) else listOf(Color(0xFF475569), Color(0xFF334155)),
                 onClick = { onLaunchApp(SimPhoneApp.RICHEST) }
             )
+        }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Row 3: Specs
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             SimPhoneAppIcon(
                 title = "Device Info",
                 emoji = "⚙️",
@@ -433,19 +476,19 @@ private fun SimPhoneAppIcon(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(8.dp)
+            .padding(6.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(62.dp)
-                .clip(RoundedCornerShape(18.dp))
+                .size(58.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(Brush.linearGradient(bgGradient)),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = emoji, fontSize = 30.sp)
+            Text(text = emoji, fontSize = 28.sp)
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = title,
@@ -462,13 +505,242 @@ private fun SimPhoneAppIcon(
                 text = badge,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
                 style = MaterialTheme.typography.labelSmall,
-                fontSize = 9.sp,
+                fontSize = 8.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
     }
 }
 
+// 🚗 SIMRIDER (UBER GIG APP ON SIMPHONE PRO)
+@Composable
+private fun PhoneUberAppScreen(
+    character: Character,
+    onCompleteUberRide: (UberTrip) -> Unit
+) {
+    var isSearching by remember { mutableStateOf(false) }
+    var currentPassengerTrip by remember { mutableStateOf<UberTrip?>(null) }
+    val tripsLeft = (5 - character.rideshareTripsThisYear).coerceAtLeast(0)
+
+    LaunchedEffect(isSearching) {
+        if (isSearching) {
+            delay(1200) // Finding passenger radar
+            currentPassengerTrip = LifeEventGenerator.UBER_TRIPS.random()
+            isSearching = false
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Driver Profile Card
+        item {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFF0F172A)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "🚗", fontSize = 26.sp)
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "SimRider Driver Hub",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                        Text(
+                            text = if (character.hasCar) "Vehicle: Active Car" else "Vehicle: None (Car Required)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (character.hasCar) LifeEmerald else LifeRose,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Driver Rating: 4.96 ⭐ • Verified",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (tripsLeft > 0) LifeEmerald.copy(alpha = 0.2f) else LifeRose.copy(alpha = 0.2f)
+                    ) {
+                        Text(
+                            text = "$tripsLeft/5 Left",
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (tripsLeft > 0) LifeEmerald else LifeRose,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        if (!character.hasCar) {
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Text(
+                            text = "🚫 Vehicle Required to Drive",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "SimRider requires you to own an automobile. Buy a car in the Asset Market to start picking up passengers!",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        } else if (tripsLeft == 0) {
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Text(
+                            text = "🏁 Annual Driving Quota Reached",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "You have completed all 5 gig rides for Year ${character.currentYear}. Age up (+1 Year) to refresh your driving quota!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        } else {
+            // Find Ride Button or Current Trip Card
+            item {
+                if (currentPassengerTrip == null) {
+                    Button(
+                        onClick = { isSearching = true },
+                        enabled = !isSearching,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text(
+                            text = if (isSearching) "Searching for Nearby Passengers... 📡" else "Find Passenger Ride 🔍",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else {
+                    val trip = currentPassengerTrip!!
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 3.dp
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = trip.emoji, fontSize = 28.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = trip.passengerName,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Destination: ${trip.destination}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Base Fare: ${character.currencySymbol}${trip.fare}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Tip: +${character.currencySymbol}${trip.tip}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = LifeEmerald,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Note: \"${trip.review}\" • ${trip.rating}⭐",
+                                    modifier = Modifier.padding(8.dp),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            val total = trip.fare + trip.tip
+                            Button(
+                                onClick = {
+                                    onCompleteUberRide(trip)
+                                    currentPassengerTrip = null
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald)
+                            ) {
+                                Text("Complete Ride & Collect ${character.currencySymbol}$total 💸", fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 📰 NEWS SCREEN
 @Composable
 private fun PhoneNewsAppScreen(
     currentYear: Int,
@@ -477,12 +749,10 @@ private fun PhoneNewsAppScreen(
     onSelectArticle: (NewsArticle) -> Unit
 ) {
     val categories = listOf("All", "Tech", "Economy", "Culture", "Science", "Entertainment", "World")
-    // Only news up to the current year are unlocked!
     val unlockedNews = NewsAndRichDatabase.getUnlockedNews(currentYear)
     val filtered = if (selectedCategory == "All") unlockedNews else unlockedNews.filter { it.category.equals(selectedCategory, ignoreCase = true) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Notification banner about progressive unlocking
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
@@ -500,7 +770,6 @@ private fun PhoneNewsAppScreen(
             }
         }
 
-        // Horizontal category pills
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -582,35 +851,34 @@ private fun PhoneNewsAppScreen(
     }
 }
 
-// 🏦 SIMBANK APP WITH 2-SECOND PAYMENT ANIMATION & POPUP
+// 🏦 SIMBANK APP WITH DEBT PAYOFF & RECIPIENTS
 @Composable
 private fun PhoneBankAppScreen(
     character: Character,
     currencyFormatter: NumberFormat,
     onSendMoney: (recipient: String, amount: Long) -> Unit,
-    onReceiveMoney: (amount: Long, source: String) -> Unit
+    onReceiveMoney: (amount: Long, source: String) -> Unit,
+    onPayDebt: (amount: Long) -> Unit,
+    onTakeLoan: (amount: Long) -> Unit
 ) {
     var transferAmountText by remember { mutableStateOf("100") }
     var selectedRecipient by remember { mutableStateOf(character.relationships.firstOrNull()?.name ?: "Mother") }
-    var isCustomRecipient by remember { mutableStateOf(false) }
     var customRecipientText by remember { mutableStateOf("") }
+    var isCustomRecipient by remember { mutableStateOf(false) }
 
-    // Transfer State: IDLE, PROCESSING (2 sec), SUCCESS_POPUP
     var transferState by remember { mutableStateOf("IDLE") }
     var lastSentAmount by remember { mutableStateOf(0L) }
     var lastSentRecipient by remember { mutableStateOf("") }
     var transactionId by remember { mutableStateOf("") }
 
-    // Coroutine for the 2-second payment animation
     LaunchedEffect(transferState) {
         if (transferState == "PROCESSING") {
-            delay(2000) // Exactly 2 seconds animation as requested!
+            delay(2000)
             transferState = "SUCCESS_POPUP"
         }
     }
 
     if (transferState == "SUCCESS_POPUP") {
-        // "Pay sent popup and you press fine button to get off it now it takes money off your balance"
         Dialog(onDismissRequest = {
             onSendMoney(lastSentRecipient, lastSentAmount)
             transferState = "IDLE"
@@ -682,7 +950,6 @@ private fun PhoneBankAppScreen(
     }
 
     if (transferState == "PROCESSING") {
-        // 2-Second Payment Animation
         val infiniteTransition = rememberInfiniteTransition(label = "wire_spin")
         val rotation by infiniteTransition.animateFloat(
             initialValue = 0f,
@@ -777,6 +1044,85 @@ private fun PhoneBankAppScreen(
             }
         }
 
+        // Debt & Loan Card
+        item {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = if (character.debt > 0) LifeRose.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface,
+                tonalElevation = 2.dp
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "💳 Loan & Debt Center",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (character.debt > 0) "Debt: ${character.currencySymbol}${currencyFormatter.format(character.debt)}" else "No Outstanding Debt",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (character.debt > 0) LifeRose else LifeEmerald
+                        )
+                    }
+
+                    if (character.debt > 0) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Accrues 5% interest per year. Pay down your balance to protect your credit and avoid penalties!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { onPayDebt(100L) },
+                                modifier = Modifier.weight(1f),
+                                enabled = character.bankBalance >= 100L
+                            ) {
+                                Text("Pay ${character.currencySymbol}100", fontSize = 11.sp)
+                            }
+                            Button(
+                                onClick = { onPayDebt(character.debt) },
+                                modifier = Modifier.weight(1f),
+                                enabled = character.bankBalance >= character.debt,
+                                colors = ButtonDefaults.buttonColors(containerColor = LifeEmerald)
+                            ) {
+                                Text("Pay Full Debt", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Need emergency capital? Apply for an unsecured personal loan from SimBank.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { onTakeLoan(500L) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Borrow ${character.currencySymbol}500", fontSize = 11.sp)
+                            }
+                            OutlinedButton(
+                                onClick = { onTakeLoan(2000L) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Borrow ${character.currencySymbol}2,000", fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Send Money Section
         item {
             Surface(
@@ -787,7 +1133,7 @@ private fun PhoneBankAppScreen(
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Text(
-                        text = "💸 Send Money (Wire Transfer)",
+                        text = "💸 Wire Money to Loved Ones",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -795,7 +1141,7 @@ private fun PhoneBankAppScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Select Recipient:",
+                        text = "Select Recipient (Family & Friends):",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -813,11 +1159,28 @@ private fun PhoneBankAppScreen(
                                 label = { Text("${rel.role.icon} ${rel.name}", fontSize = 11.sp) }
                             )
                         }
+                        item {
+                            FilterChip(
+                                selected = isCustomRecipient,
+                                onClick = { isCustomRecipient = true },
+                                label = { Text("✍️ Custom", fontSize = 11.sp) }
+                            )
+                        }
+                    }
+
+                    if (isCustomRecipient) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = customRecipientText,
+                            onValueChange = { customRecipientText = it },
+                            label = { Text("Recipient Name") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Amount Field
                     OutlinedTextField(
                         value = transferAmountText,
                         onValueChange = { transferAmountText = it.filter { ch -> ch.isDigit() } },
@@ -831,11 +1194,12 @@ private fun PhoneBankAppScreen(
 
                     val amountLong = transferAmountText.toLongOrNull() ?: 0L
                     val canSend = amountLong in 1..character.bankBalance
+                    val finalRecipient = if (isCustomRecipient && customRecipientText.isNotBlank()) customRecipientText else selectedRecipient
 
                     Button(
                         onClick = {
                             lastSentAmount = amountLong
-                            lastSentRecipient = selectedRecipient
+                            lastSentRecipient = finalRecipient
                             transactionId = "TXN-${UUID.randomUUID().toString().take(8).uppercase()}"
                             transferState = "PROCESSING"
                         },
@@ -856,7 +1220,7 @@ private fun PhoneBankAppScreen(
             }
         }
 
-        // Request Allowance / Gift Section
+        // 📜 Account Statement & Bank Activity Log
         item {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -865,43 +1229,67 @@ private fun PhoneBankAppScreen(
                 tonalElevation = 2.dp
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
-                    Text(
-                        text = "📥 Request Funds / Allowance",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Ask your parents or friends to wire you emergency pocket cash.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedButton(
-                            onClick = {
-                                val gift = 50L
-                                onReceiveMoney(gift, "Pocket Allowance from Family")
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text("Ask ${character.currencySymbol}50", fontSize = 11.sp)
-                        }
+                        Text(
+                            text = "📜 Account Statement Log",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "${character.bankTransactions.size} records",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
-                        OutlinedButton(
-                            onClick = {
-                                val gift = 150L
-                                onReceiveMoney(gift, "Gift Transfer from Loved One")
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text("Ask ${character.currencySymbol}150", fontSize = 11.sp)
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (character.bankTransactions.isEmpty()) {
+                        Text(
+                            text = "No recent transactions. Transfers, debt repayments, salary deposits, and Uber earnings will appear here.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            character.bankTransactions.take(20).forEach { tx ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = tx.title,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = tx.dateOrYear,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 10.sp
+                                        )
+                                    }
+                                    Text(
+                                        text = "${if (tx.isIncoming) "+" else "-"}${character.currencySymbol}${currencyFormatter.format(tx.amount)}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Black,
+                                        color = if (tx.isIncoming) LifeEmerald else LifeRose
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -910,7 +1298,7 @@ private fun PhoneBankAppScreen(
     }
 }
 
-// 🏆 RICHEST 100 LEADERBOARD (EXCLUSIVE TO SIMPHONE PRO)
+// 🏆 RICHEST 100 LEADERBOARD
 @Composable
 private fun PhoneRichestAppScreen(
     character: Character,
@@ -1034,7 +1422,11 @@ private fun PhoneRichestAppScreen(
 }
 
 @Composable
-private fun ProFeatureLockedView(onUpgradeClick: () -> Unit) {
+private fun ProFeatureLockedView(
+    featureTitle: String,
+    featureDescription: String,
+    onUpgradeClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1055,7 +1447,7 @@ private fun ProFeatureLockedView(onUpgradeClick: () -> Unit) {
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = "SimPhone Pro Exclusive",
+            text = featureTitle,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Black
         )
@@ -1063,7 +1455,7 @@ private fun ProFeatureLockedView(onUpgradeClick: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "The Forbes 100 Richest People Leaderboard is exclusively available on SimPhone Pro ($999). Upgrade your device in the Assets store!",
+            text = featureDescription,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1076,7 +1468,7 @@ private fun ProFeatureLockedView(onUpgradeClick: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = LifeGold)
         ) {
-            Text("Go to Assets Store", color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("Upgrade to SimPhone Pro 🚀", color = Color.Black, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -1097,7 +1489,7 @@ private fun PhoneSpecsAppScreen(character: Character) {
             fontWeight = FontWeight.Black
         )
         Text(
-            text = "Operating System: SimOS v2.0",
+            text = "Operating System: SimOS v2.2",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -1111,8 +1503,8 @@ private fun PhoneSpecsAppScreen(character: Character) {
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 SpecItem("Installed Model", character.phoneModelName)
-                SpecItem("First Release Year", "2001")
                 SpecItem("Current Calendar Year", "Year ${character.currentYear}")
+                SpecItem("SimRider Uber Driving", if (character.hasSimPhonePro) "Supported (Pro)" else "Pro Version Required")
                 SpecItem("Leaderboard Support", if (character.hasSimPhonePro) "Enabled (Pro)" else "Pro Version Required")
                 SpecItem("Banking Protocol", "SimBank Secure Wireless")
             }

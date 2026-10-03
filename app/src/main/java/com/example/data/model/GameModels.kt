@@ -38,7 +38,10 @@ enum class AssetType(val icon: String) {
     REAL_ESTATE("🏠"),
     PET("🐶"),
     PHONE("📱"),
-    TECH("💻")
+    PC("🖥️"),
+    ROUTER("📶"),
+    TECH("💻"),
+    BUSINESS("🏢")
 }
 
 data class Asset(
@@ -133,9 +136,31 @@ data class JobListing(
     val salary: Long,
     val minAge: Int,
     val minSmarts: Int,
+    val category: String = "General",
     val requiredDegree: Degree = Degree.NONE,
     val interviewQuestion: String,
     val interviewChoices: List<JobInterviewChoice>
+)
+
+data class FoodItem(
+    val id: String,
+    val name: String,
+    val cost: Long,
+    val hungerRestore: Int,
+    val healthBonus: Int,
+    val happinessBonus: Int,
+    val emoji: String,
+    val description: String
+)
+
+data class UberTrip(
+    val passengerName: String,
+    val destination: String,
+    val fare: Long,
+    val tip: Long,
+    val rating: Float,
+    val emoji: String,
+    val review: String
 )
 
 data class JobInterviewChoice(
@@ -243,6 +268,53 @@ data class RoadmapMilestone(
     val highlights: List<String>
 )
 
+data class BusinessProduct(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val unitCost: Long,
+    val retailPrice: Long,
+    val emoji: String,
+    var unitsSoldThisYear: Int = 0,
+    var isActive: Boolean = true
+)
+
+data class PublishedPhoneModel(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val chipTier: String,
+    val retailPrice: Long,
+    val partnerCompany: String,
+    val unitsProduced: Int,
+    var unitsSold: Int = 0,
+    var totalRevenue: Long = 0L
+)
+
+data class BusinessEntity(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val industry: String,
+    val emoji: String,
+    var valuation: Long,
+    var cashBalance: Long,
+    var employees: Int = 2,
+    var managers: Int = 0,
+    var storageCapacity: Int = 250,
+    var annualRevenue: Long = 0L,
+    var annualExpenses: Long = 0L,
+    val products: MutableList<BusinessProduct> = mutableListOf(),
+    val publishedPhones: MutableList<PublishedPhoneModel> = mutableListOf()
+)
+
+data class BusinessBlueprint(
+    val id: String,
+    val name: String,
+    val industry: String,
+    val emoji: String,
+    val minCapital: Long,
+    val description: String,
+    val defaultProducts: List<BusinessProduct>
+)
+
 data class Character(
     val id: String = UUID.randomUUID().toString(),
     val firstName: String,
@@ -265,16 +337,53 @@ data class Character(
     var degree: Degree = Degree.NONE,
     val relationships: MutableList<Relationship> = mutableListOf(),
     val assets: MutableList<Asset> = mutableListOf(),
+    val sideJobs: MutableList<JobListing> = mutableListOf(),
+    val businesses: MutableList<BusinessEntity> = mutableListOf(),
+    val stockHoldings: MutableMap<String, Long> = mutableMapOf(),
+    val bondHoldings: MutableMap<String, Long> = mutableMapOf(),
+    val etfHoldings: MutableMap<String, Long> = mutableMapOf(),
+    val cryptoHoldings: MutableMap<String, Double> = mutableMapOf(),
+    val customCryptoCoins: MutableList<CustomCryptoCoin> = mutableListOf(),
+    var creditScore: Int = 710,
+    var socialFollowers: Long = 180L,
+    var isSocialVerified: Boolean = false,
+    val socialPosts: MutableList<SocialPost> = mutableListOf(),
+    val chatThreads: MutableList<ChatThread> = mutableListOf(),
+    var schoolGradePercent: Int = 86,
+    val joinedClubs: MutableList<String> = mutableListOf(),
+    var teacherRelationship: Int = 80,
+    var schoolDetentions: Int = 0,
     var isAlive: Boolean = true,
     var causeOfDeath: String? = null,
     var ageOfDeath: Int? = null,
-    var phoneNotified: Boolean = false
+    var phoneNotified: Boolean = false,
+    var pcNotified: Boolean = false,
+    var kickedOutNotified: Boolean = false,
+    var hunger: Int = 95,
+    var debt: Long = 0L,
+    var hasLemonadeStand: Boolean = false,
+    var lemonadeSupplies: Int = 15,
+    var lemonadePrice: Double = 1.50,
+    var lemonadeStandRevenue: Long = 0L,
+    var lemonadeStandUpgradeLevel: Int = 1,
+    var rideshareTripsThisYear: Int = 0
 ) {
     val fullName: String get() = "$firstName $lastName"
     val currentYear: Int get() = birthYear + age
     val hasPhone: Boolean get() = assets.any { it.type == AssetType.PHONE || it.name.contains("SimPhone", ignoreCase = true) }
+    val hasSimPhoneMax: Boolean get() = assets.any { it.name.contains("Max", ignoreCase = true) }
     val hasSimPhonePro: Boolean get() = assets.any { it.name.contains("Pro", ignoreCase = true) }
     val phoneModelName: String get() = assets.firstOrNull { it.type == AssetType.PHONE || it.name.contains("SimPhone", ignoreCase = true) }?.name ?: "None"
+    val hasCar: Boolean get() = assets.any { it.type == AssetType.CAR }
+    val hasPC: Boolean get() = assets.any { it.type == AssetType.PC || it.name.contains("Desktop PC", ignoreCase = true) }
+    val hasRouter: Boolean get() = assets.any { it.type == AssetType.ROUTER || it.name.contains("Router", ignoreCase = true) }
+    val hasInternet: Boolean get() = age < 18 || hasRouter
+    val hasHome: Boolean get() = age < 18 || assets.any { it.type == AssetType.REAL_ESTATE }
+    val totalPhysicalAssetValue: Long get() = assets.sumOf { it.value }
+    val totalBusinessValue: Long get() = businesses.sumOf { it.valuation }
+    val totalCustomCryptoValue: Long get() = customCryptoCoins.sumOf { (it.playerCoinsHeld * it.price).toLong() }
+    val totalInvestmentsValue: Long get() = totalCustomCryptoValue + stockHoldings.values.sum() * 150L + bondHoldings.values.sum() * 1000L + etfHoldings.values.sum() * 300L + (cryptoHoldings.values.sum() * 1000.0).toLong()
+    val netWorth: Long get() = bankBalance + totalPhysicalAssetValue + totalBusinessValue + totalInvestmentsValue - debt
     val bankTransactions: MutableList<BankTransaction> = mutableListOf()
 
     val avatarEmoji: String
